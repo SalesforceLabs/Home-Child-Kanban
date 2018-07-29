@@ -1,0 +1,136 @@
+<!--
+Strike by Appiphony
+
+Version: 1.0.0
+Website: http://www.lightningstrike.io
+GitHub: https://github.com/appiphony/Strike-Components
+License: BSD 3-Clause License
+-->
+<aura:component access="global">
+    <!-- Required -->
+    <aura:attribute name="label" type="String" required="true" description="Text that describes the desired textarea input" default="Strike Multi-Select"/>
+
+    <aura:attribute name="placeholder" type="String" description="placeholder text that will be displayed on the input field when the component is initialized"/>
+    <aura:attribute name="class" type="String" description="A CSS class that will be applied to the outer element. This style is in addition to base classes associated with the component"/>
+    <aura:attribute name="value" type="String" description="semi-colon separated values that reflect the selected pills"/>
+
+    <aura:attribute name="errorMessage" type="String" description="message to be displayed when the component is in an error state"/>
+
+    <aura:attribute name="disabled" type="Boolean" description="Can be toggled to make the field disabled"/>
+    <aura:attribute name="required" type="Boolean" description="displays an * indicating that the field is required"/>
+    <aura:attribute name="error" type="Boolean" description="Specifies whether or not the text area is in an error state. This will trigger errorMessage"/>
+    <aura:attribute name="helpText" type="String" description="Specifies helper text to be displayed as a tooltip"/>
+    <aura:attribute name="helpTextPlacement" type="String" default="auto top" description="Determines position of the helpText"/>
+
+    <!-- Methods -->
+    <aura:method name="showError" action="{!c.showError}" description="A method which triggers the error state">
+        <aura:attribute name="errorMessage" type="String"/>
+    </aura:method>
+    <aura:method name="hideError" action="{!c.hideError}" description="A method which removes the error state"/>
+    <aura:method name="externalValueChange" action="{!c.externalValueChange}" description="A method that can be called to change the value of the component from a source other than the strike_multiSelectPicklist component">
+        <aura:attribute name="externalValue" type="String" description="value that is to be added to the value of the strike_multiSelectPicklist Component"/>
+    </aura:method>
+    <!-- Internal -->
+    <aura:attribute name="idNumber" type="Integer" access="private" description="Random id assigned to pair labels with inputs"/>
+    <aura:attribute name="focusIndex" type="Integer" access="private" description="Index to determine focus location when keyboard is used"/>
+    <aura:attribute name="menuIsOpen" type="Boolean" access="private" description="toggles the slds-is-open class for the lookup menu"/>
+    <aura:attribute name="selectedOptionPills" type="Object[]" access="private" description="pills to be populated when an option is selected from the dropdown"/>
+    <aura:attribute name="validChildCmps" type="Object[]" access="private" description="stores valid child components to utilize when an iterator is used"/>
+    <aura:attribute name="alreadyRendered" type="Boolean" access="private" description="is set to true after the initial render"/>
+    <aura:attribute name="isMobile" type="Boolean" default="{!false}" description="Determines if the user is in Salesforce1" access="private"/>
+    <aura:attribute name="allChildrenFiltered" type="Boolean" description="is set to true if none of the strikeOption components are displayed" default="{!false}"/>
+    <aura:attribute name="noResultsMessage" type="String" default="No results found for {0}" description="String value that will appear when the component finds 0 results"/>
+    <aura:attribute name="searchTerm" type="String" description="String value of the user's entered search term"/>
+
+    <!-- Event registration and handlers -->
+    <aura:registerEvent name="onchange" type="c:custom_event"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+    <aura:handler event="aura:doneRendering" action="{!c.handleDoneRendering}"/>
+    <aura:handler name="custom_evt_notifyParent" event="c:custom_event" action="{!c.handleNotifyParent}" includeFacets="true" description="handles when a StrikeOption is clicked"/>
+    <aura:handler name="strike_evt_componentDestroyed" event="c:custom_event" action="{!c.handleComponentDestroyed}" includeFacets="true" description="handles when a StrikeOption is clicked"/>
+
+    <!-- Strike MultiSelect -->
+    <div aura:id="multiSelectMenu" class="{!'slds-form-element slds-lookup ' + if(v.isMobile, 'smsp-picklist--mobile ', '') + if(v.menuIsOpen, 'slds-is-open ', '') + v.class}" data-select="single">
+        <label class="slds-form-element__label" for="{!'strike-multi-select-' + v.idNumber}">
+            <aura:if isTrue="{!v.required}">
+                <abbr class="slds-required" title="required">*</abbr>
+            </aura:if>
+            {!v.label}
+        </label>
+        <aura:if isTrue="{!and(v.helpText, v.helpText != '')}">
+            <!--<c:strike_tooltip placement="{!v.helpTextPlacement}" text="{!v.helpText}" class="smsp-help-text-icon">
+                <lightning:icon iconName="utility:info" size="xx-small"/>
+            </c:strike_tooltip>-->
+        </aura:if>
+
+        <div class="{!'slds-form-element__control' + if(v.error, ' slds-has-error', '')}">
+            <div class="slds-input-has-icon slds-input-has-icon--right">
+                <lightning:icon iconName="utility:search" class="slds-input__icon" size="x-small"/>
+                <input
+                    aura:id="inputField"
+                    id="{!'strike-multi-select-' + v.idNumber}"
+                    type="text"
+                    class="slds-lookup__search-input slds-input"
+                    placeholder="{!v.placeholder}"
+                    role="combobox"
+                    aria-expanded="false"
+                    aria-autocomplete="list"
+                    onfocus="{!c.handleOnfocus}"
+                    onclick="{!c.handleOnclick}"
+                    onblur="{!c.handleOnblur}"
+                    onkeyup="{!c.handleOnkeyup}"
+                    disabled="{!v.disabled}"/>
+            </div>
+            <aura:if isTrue="{!and(v.error, not(empty(v.errorMessage)))}">
+                <div class="slds-form-element__help">{!v.errorMessage}</div>
+            </aura:if>
+        </div>
+
+        <ui:scrollerWrapper class="slds-lookup__menu" aura:id="scrollerWrapper">
+            <aura:if isTrue="{!v.isMobile}">
+                <div class="smsp-picklist__mobile-header smsp-full-button_container slds-grid slds-grid--pull-padded-xx-small">
+                    <div class="slds-col slds-p-horizontal--xx-small">
+                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                            <lightning:icon iconName="utility:search" class="slds-input__icon" size="x-small"/>
+                            <input
+                                aura:id="mobileInputField"
+                                id="{!'strike-multi-select-' + v.idNumber + '--mobile'}"
+                                type="text"
+                                class="slds-lookup__search-input slds-input"
+                                placeholder="{!v.placeholder}"
+                                role="combobox"
+                                aria-expanded="false"
+                                aria-autocomplete="list"
+                                onblur="{!c.handleOnblur}"
+                                onkeyup="{!c.handleOnkeyup}"/>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-no-flex slds-p-horizontal--xx-small">
+                        <button class="slds-button slds-button--neutral">Cancel</button>
+                    </div>
+                </div>
+            </aura:if>
+            <ul class="slds-dropdown__list slds-dropdown--length-5" role="listbox">
+                <aura:if isTrue="{!v.allChildrenFiltered}">
+                    <li role="presentation">
+                        <span class="slds-lookup__item-action slds-media sl-no-results" role="option">
+                            <div class="slds-media__body">
+                                <div class="slds-lookup__result-text">
+                                    {!format(v.noResultsMessage, '"' + v.searchTerm + '"')}
+                                </div>
+                            </div>
+                        </span>
+                    </li>
+                </aura:if>
+                {!v.body}
+            </ul>
+        </ui:scrollerWrapper>
+        <aura:if isTrue="{!not(empty(v.selectedOptionPills))}">
+            <div aura:id="optionPillContainer" class="slds-pill_container slds-pill_container--bare slds-wrap">
+                <aura:iteration items="{!v.selectedOptionPills}" var="pill">
+                    <span class="smsp-pill"><c:custom_pill label="{!pill.label}" value="{!pill.value}" iconName="{!pill.iconName}" destroyable="{!pill.destroyable}" /></span>
+                </aura:iteration>
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

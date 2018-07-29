@@ -1,0 +1,81 @@
+<!--
+/*
+ * Copyright (c) 2018, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Open Source Code</fullName>
+    <types>
+        <members>HomeChildKanbanCObjUtil</members>
+        <members>HomeChildKanbanCls</members>
+        <members>HomeChildKanbanCls_Test</members>
+        <members>HomeChildKanbanObjUtil</members>
+        <members>HomeChildKanbanUtil</members>
+        <members>KanbanConfigList</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>HomeChildKanban</members>
+        <members>HomeChildKanbanCol</members>
+        <members>HomeChildKanbanConfig</members>
+        <members>HomeChildKanbanCrd</members>
+        <members>HomeChildKanbanDeleteEvt</members>
+        <members>HomeChildKanbanEvt</members>
+        <members>RemoveValidations</members>
+        <members>custom_event</members>
+        <members>custom_evt_notifyParent</members>
+        <members>custom_multiPickList</members>
+        <members>custom_option</members>
+        <members>custom_optionGroup</members>
+        <members>custom_pill</members>
+        <members>custom_select</members>
+        <members>defaultTokens</members>
+        <members>sobjectselected</members>
+        <name>AuraDefinitionBundle</name>
+    </types>
+    <types>
+        <members>Kanban_Configuration</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Kanban_Configuration__c.Child_Object__c</members>
+        <members>Kanban_Configuration__c.Exclude_From_Group_By__c</members>
+        <members>Kanban_Configuration__c.Fields_To_Show__c</members>
+        <members>Kanban_Configuration__c.For_Object__c</members>
+        <members>Kanban_Configuration__c.Group_By__c</members>
+        <members>Kanban_Configuration__c.Kanban_For__c</members>
+        <members>Kanban_Configuration__c.Name_Field__c</members>
+        <members>Kanban_Configuration__c.Relation_Field__c</members>
+        <members>Kanban_Configuration__c.Summarize_By__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Kanban_Configuration__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Kanban_Configuration__c</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>Kanban_Configuration_UtilityBar</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>Kanban_Configuration__c-Kanban Configuration Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>Kanban_Configuration__c.All</members>
+        <name>ListView</name>
+    </types>
+    <types>
+        <members>HomeChildKanbanjs</members>
+        <name>StaticResource</name>
+    </types>
+    <version>43.0</version>
+</Package>

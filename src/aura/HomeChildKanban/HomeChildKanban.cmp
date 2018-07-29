@@ -1,0 +1,119 @@
+<!--
+/*
+ * Copyright (c) 2018, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+-->
+<aura:component controller="HomeChildKanbanCls" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="HeaderTitle" type="string" access='global'/>
+    <aura:attribute name="objName" type="string"/>
+    <aura:attribute name="objRelField" type="string"/>
+    <aura:attribute name="objFields" type="string" default="Name"/>
+    <aura:attribute name="kanbanPicklistField" type="string"/>
+    <aura:attribute name="kanbanSummaryField" type="string"/>
+    <aura:attribute name="kanbanHeight" type="integer" default="250" access='global'/>
+    <aura:attribute name="ExcVal" type="string" default=""/>
+    <aura:attribute name="delInfo" type="object"/>
+    
+    <aura:attribute name="kanbanConfigId" type="string" access='global'/>
+    
+    <aura:attribute name="kwrap" type="HomeChildKanbanUtil"/>
+    
+    <aura:attribute name="isSuccess" type="boolean" default="true"/>
+    <aura:attribute name="errorMessage" type="String"/>
+    
+    <!--<aura:handler name="init" value="this" action="{!c.doInit}"/>-->
+    <aura:handler name="kanbanChildChanged" event="c:HomeChildKanbanEvt" action="{!c.childChanged}"/>
+    <aura:handler name="kanbanChildDelReq" event="c:HomeChildKanbanDeleteEvt" action="{!c.childDelete}"/>
+    
+ 	<!--{!v.kanbanConfigId.value}
+    {!v.record.Name}-->
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+
+    <force:recordData aura:id="recordLoader"
+                      recordId="{!v.kanbanConfigId}"
+                      layoutType="FULL"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.simpleRecord}"
+                      targetError="{!v.recordError}"
+                      recordUpdated="{!c.handleRecordUpdated}"
+                      />
+    
+    
+    <aura:if isTrue="{!not(empty(v.recordError))}">
+        <div class="recordError">
+            <ui:message title="Kanban Error" severity="error" closable="true">
+                {!v.recordError}
+            </ui:message>
+        </div>
+        <aura:set attribute="else">
+    
+    <aura:if isTrue="{!v.isSuccess}">
+        <lightning:card iconName="utility:kanban">
+            <aura:set attribute="title">
+                <!--class="{!not(empty(v.recordId)) ? 'boardHeaderTitle cPointer slds-truncate' : 'slds-truncate'}"-->
+                <span class="slds-truncate">
+                <aura:if isTrue="{!not(empty(v.HeaderTitle))}">
+                    {!v.HeaderTitle}
+                    <aura:set attribute="else">
+                		{!v.kwrap.cObjName + ' Kanban'} 
+                    </aura:set>
+                </aura:if>
+                </span>
+                <p class="slds-truncate">
+                    <span class="slds-text-title_caps">{!'grouped by '+ v.kwrap.gFieldName}</span>
+                    <aura:if isTrue="{!not(empty(v.kwrap.sumField))}">
+                        <span class="slds-text-title_caps">{!' • Summarized by '+ v.kwrap.sumField}</span>
+                    </aura:if>
+                </p>
+            </aura:set>
+                
+            <aura:set attribute="actions">
+                <lightning:buttonGroup >
+                    <aura:if isTrue="{!v.kwrap.isCreatable}">
+                        <lightning:button label="New" variant="neutral" onclick="{!c.initiateNewRecordCreation}"/>
+                    </aura:if>
+                    <lightning:buttonIcon iconName="utility:refresh" variant="neutral" onclick="{!c.handleRecordUpdated}" alternativeText="Refresh Data" aura:id="refreshButton"/>
+                </lightning:buttonGroup>
+        		</aura:set>
+            <div class="cardClass" style="position:relative;">
+                <div class="kanbanContainerDiv">
+                    <aura:iteration items="{!v.kwrap.pickVals}" var="pv">
+                        <c:HomeChildKanbanCol fldList="{!v.record.fields.kanbanDev__Fields_To_Show__c.value}" kanbanHeight="{!v.kanbanHeight}" kanbanField="{!v.record.fields.kanbanDev__Group_By__c.value}" pickvalue="{!pv}" pickvalueLength="{!v.kwrap.pickVals.length}" recsMap="{!v.kwrap.records}" summaryMap="{!v.kwrap.rollupData}" rsFld="{!v.kwrap.sFldType}" fieldEditable="{!v.kwrap.isEditable}" objDeletable="{!v.kwrap.isDeletable}" fieldTypeMap="{!v.kwrap.fieldTypeMap}"/>
+                    </aura:iteration>
+                </div>
+                <lightning:spinner variant="brand" size="large" aura:id="spinner" class="slds-hide"/>
+            </div>
+        </lightning:card>
+        <aura:set attribute="else">
+            <ui:message title="Kanban Component Error" severity="error">
+                {!v.errorMessage}
+            </ui:message>
+        </aura:set>
+        
+    </aura:if>
+    
+    <section aura:id="srModal" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" iconName="utility:close" variant="bare" alternativeText="Settings" onclick="{!c.closeModal}"/>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Delete Record</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <p class="slds-text-align_center">Are you sure you want to delete this record?</p>
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning:button variant="neutral" label="Cancel" onclick="{!c.closeModal}"/>
+                <lightning:button variant="brand" label="Delete" onclick="{!c.deleteRecord}"/>
+            </footer>
+        </div>
+    </section>
+    <div aura:id="modalBkdrp" class="slds-backdrop"></div>
+            </aura:set>
+    </aura:if>
+    
+</aura:component>

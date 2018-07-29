@@ -1,0 +1,66 @@
+<!--
+/*
+ * Copyright (c) 2018, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+-->
+<aura:component >
+    
+    <aura:attribute name="rec" type="object"/>
+    <aura:attribute name="dList" type="list"/>
+    <aura:attribute name="fieldList" type="list"/>
+    <aura:attribute name="pval" type="string"/>
+    <aura:attribute name="recPos" type="string"/>
+    
+    <aura:attribute name="firstTimeRendered" type="boolean" default="false"/>
+    
+    <aura:attribute name="fieldEditable" type="boolean"/>
+    <aura:attribute name="objDeletable" type="boolean"/>
+    
+    <aura:attribute name="fieldTypeMap" type="object"/>
+    
+    <aura:attribute name="namePos" type="Integer"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="kanbanChildDelReq" type="c:HomeChildKanbanDeleteEvt"/>
+    
+    <article class="slds-tile slds-tile_board" aura:id="newCard">
+        
+        <aura:iteration items="{!v.dList}" var="dt" indexVar="ivar">
+            <aura:if isTrue="{!ivar == 0}">
+                <lightning:layout >
+                    <lightning:layoutItem size="11" flexibility="no-grow">
+                        <aura:if isTrue="{!v.namePos == ivar}">
+                            <div class="{!v.namePos == ivar ? 'slds-truncate slds-link':'slds-truncate'}" id="{!v.namePos == ivar ? v.rec.Id:''}" onclick="{!c.navToRec}" title="{!dt}">{!dt}</div>
+                            <aura:set attribute="else">
+                                <div class="slds-truncate"><lightning:formattedRichText value="{!dt}"/></div>
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1" flexibility="no-grow">
+                        <aura:if isTrue="{!v.fieldEditable || v.objDeletable == true ? true : false}">
+                            <lightning:buttonMenu alternativeText="Toggle menu" value="{!v.rec.Id}" menuAlignment="right" iconSize="x-small" onselect="{!c.recActionSelected}" class="slds-float_right">
+                                <aura:if isTrue="{!v.fieldEditable}">
+                                    <lightning:menuItem label="Edit" value="Edit"/>
+                                </aura:if>
+                                <aura:if isTrue="{!v.objDeletable}">
+                                    <lightning:menuItem label="Delete" value="Delete"/>
+                                </aura:if>
+                            </lightning:buttonMenu>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!v.namePos == ivar}">
+                        <div class="{!v.namePos == ivar ? 'slds-truncate slds-link':'slds-truncate'}" id="{!v.namePos == ivar ? v.rec.Id:''}" onclick="{!c.navToRec}" title="{!dt}">{!dt}</div>
+                        <aura:set attribute="else">
+                            <div class="slds-truncate"><lightning:formattedRichText value="{!dt}"/></div>
+                        </aura:set>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+        </aura:iteration>
+    </article>
+    
+</aura:component>

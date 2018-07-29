@@ -1,0 +1,105 @@
+
+/*
+ * Copyright (c) 2018, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+.THIS {
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    min-width: 14.5em; 
+    max-width: 22.5em;
+}
+.THIS .newCardColor{
+    background: #d9ffdf !important;
+}
+.THIS .isEditable{
+    cursor: ew-resize;
+}
+.THIS .slds-item {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    padding: 0;
+    margin: 0.25rem;
+    transition: background-color 0.3s;
+}
+.THIS .updated{
+    background-color: rgba(75, 202, 129, 0.6);
+}
+.THIS .isEditable:hover{
+    outline: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    /*-webkit-transform: translateY(-2px);
+    -ms-transform: translateY(-2px);
+    transform: translateY(-2px);*/
+    -webkit-transition: all .5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all .5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.THIS .dropZone{
+    border-right: rgb(216, 221, 230) 1px solid;
+    overflow-y:auto;
+}
+.THIS .pathType{
+    text-align:center;
+    display: block;
+    position: relative;
+    width: 100%;
+    padding: .5rem .5rem .5rem 1.5rem;
+    background: rgb(0, 112, 210);
+    color: #fff;
+    font-size: .8125rem;
+    text-align: center;
+    letter-spacing: .9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    word-wrap: normal;
+}
+.THIS .stageName{
+    display: inline-block;
+    max-width: calc(100% - 2.5rem);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    word-wrap: normal;
+    vertical-align: middle;
+}
+.THIS .stageLen{
+    display: inline-block;
+    vertical-align: middle;
+}
+.THIS .pathType:before{
+    content: "";
+    position: absolute;
+    left: -1rem;
+    top: .19rem;
+    display: block;
+    width: 1.85rem;
+    height: 1.85rem;
+    border: 2px solid #fff;
+    border-left: none;
+    border-bottom: none;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.THIS.stageaa:first-of-type .pathType{
+    border-radius: 15rem 0 0 15rem;
+}
+.THIS.stageaa:first-of-type .pathType:before{
+    display: none;
+}
+.THIS.stageaa:last-of-type .pathType{
+    border-radius: 0 15rem 15rem 0;
+}
+.THIS .summaryClass{
+    padding: .5rem 0;
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: #10aa52;
+    text-align: center;
+    border-right: rgb(216, 221, 230) 1px solid;
+}

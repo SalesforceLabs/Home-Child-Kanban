@@ -1,0 +1,55 @@
+<!--
+/*
+ * Copyright (c) 2018, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+-->
+<aura:component >
+	
+    <aura:attribute name="pickvalue" type="string"/>
+    <aura:attribute name="pickvalueLength" type="integer"/>
+    <aura:attribute name="recsMap" type="object"/>
+    <aura:attribute name="summaryMap" type="object"/>
+    <aura:attribute name="kanbanField" type="string"/>
+    <aura:attribute name="fldList" type="string"/>
+    <aura:attribute name="recs" type="list"/>
+    <aura:attribute name="summary" type="Integer"/>
+    <aura:attribute name="rsFld" type="string"/>
+    
+    <aura:attribute name="fieldEditable" type="boolean"/>
+    <aura:attribute name="objDeletable" type="boolean"/>
+    
+    <aura:attribute name="goingTo" type="string"/>
+    
+    <aura:attribute name="fieldTypeMap" type="object"/>
+    
+    <aura:attribute name="psumval" type="Integer" default='0'/>
+    
+    <ltng:require scripts="{!$Resource.HomeChildKanbanjs}" afterScriptsLoaded="{!c.sLoaded}"/>               
+    <aura:attribute name="kanbanHeight" type="integer"/>
+    
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.recsMap}" action="{!c.recordsChanged}"/>
+    <aura:registerEvent name="kanbanChildChanged" type="c:HomeChildKanbanEvt"/>
+    
+    <aura:attribute name="firstTimeRendered" type="boolean" default="false"/>
+    
+    <div class="stageaa"> 
+            <h1 class="pathType" title="{!v.pickvalue}">
+                <span class="stageName">{!v.pickvalue}</span> &nbsp;
+                <span class="stageLen">({!v.recs.length})</span>
+            </h1>
+        <p aura:id="cup" class="summaryClass slds-truncate"></p>
+        <ul aura:id="hckCol" ondrop="{!c.drop}" ondragover="{!c.allowDrop}" class="slds-has-dividers_around-space dropZone" data-Pick-Val="{!v.pickvalue}" style="{!'height:'+v.kanbanHeight+'px;'}">
+            
+            <aura:iteration var="objRecord" items="{!v.recs}" indexVar="recPos">
+                <li class="{!v.fieldEditable == true ? 'slds-item slds-m-around_small isEditable' : 'slds-item slds-m-around_small'}" draggable="{!v.fieldEditable}" ondragstart="{!c.drag}" id="{!objRecord}" value="{!recPos}">
+                    <c:HomeChildKanbanCrd firstTimeRendered="{!v.firstTimeRendered}" rec="{!objRecord}" pval="{!v.kanbanField}" fieldList="{!v.fldList}" recPos="{!recPos}" fieldEditable="{!v.fieldEditable}" objDeletable="{!v.objDeletable}" fieldTypeMap="{!v.fieldTypeMap}" aura:id="recCards"/>
+                </li>
+            </aura:iteration>
+        </ul>
+    </div>
+    
+</aura:component>

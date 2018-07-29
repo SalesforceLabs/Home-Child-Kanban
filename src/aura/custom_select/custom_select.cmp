@@ -1,0 +1,124 @@
+<!--
+Strike by Appiphony
+
+Version: 0.9.0
+Website: http://www.lightningstrike.io
+GitHub: https://github.com/appiphony/Strike-Components
+License: BSD 3-Clause License
+-->
+<aura:component access="global">
+    <aura:attribute name="label" type="String" description="String value displayed above the menu used to describe the component" />
+
+    <aura:attribute name="helpText" type="String" description="String value when hovering over the help box"/>
+    <aura:attribute name="helpTextPlacement" type="String" default="auto top" description="Determines position of the helpText"/>
+    <aura:attribute name="class" type="String" description="A CSS class that will be applied to the outer element. This style is in addition to base classes associated with the component"/>
+    <aura:attribute name="name" type="String" description="String value of the component's form name"/>
+    <aura:attribute name="placeholder" type="String" default="Select an Option" description="String value that will appear when no option is selected" />
+    <aura:attribute name="value" type="String" description="String value of the value of the selected option" />
+
+    <aura:attribute name="errorMessage" type="String" description="String value displayed when the input is in an error state" />
+
+    <aura:attribute name="searchable" type="Boolean" description="Determines whether a search input is displayed on the component" />
+
+    <aura:attribute name="disabled" type="Boolean" description="Determines whether the input is disabled" />
+    <aura:attribute name="required" type="Boolean" description="Determines whether a '*' is displayed on the component" />
+    <aura:attribute name="error" type="Boolean" description="Determines whether the input is in an error state" />
+
+    <!-- Methods -->
+    <aura:method name="showError" action="{!c.showError}" description="A method which triggers the error state">
+        <aura:attribute name="errorMessage" type="String"/>
+    </aura:method>
+    <aura:method name="hideError" action="{!c.hideError}" description="A method which removes the error state"/>
+
+    <!-- Internal -->
+    <aura:attribute name="customIcon" type="Boolean" access="private" description="Determines whether the returned icon is a custom or standard icon"/>
+    <aura:attribute name="focusIndex" type="Integer" access="private" description="Integer value that determines which option is currently selected"/>
+    <aura:attribute name="iconName" type="String" access="private" description="String value of the icon of the selected option"/>
+    <aura:attribute name="openMenu" type="Boolean" access="private" description="Determines whether the menu is open"/>
+    <aura:attribute name="valueLabel" type="String" access="private" description="String value of the label of the selected option"/>
+    <aura:attribute name="isMobile" type="Boolean" default="{!false}" description="Determines if the user is in Salesforce1" access="private"/>
+    <aura:attribute name="allChildrenFiltered" type="Boolean" description="is set to true if none of the strikeOption components are displayed" default="{!false}"/>
+    <aura:attribute name="noResultsMessage" type="String" default="No results found for {0}" description="String value that will appear when the component finds 0 results"/>
+    <aura:attribute name="searchTerm" type="String" description="String value of the user's entered search term"/>
+
+    <!-- Event registration and handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:handler name="change" value="{!v.value}" action="{!c.handleValueChange}" />
+
+    <aura:handler event="aura:doneRendering" action="{!c.doneRendering}" />
+    <aura:handler name="custom_evt_notifyParent" event="c:custom_event" action="{!c.handleNotifyParent}" includeFacets="true" description="handles when a StrikeOption is clicked" />
+
+    <aura:registerEvent name="onchange" type="c:custom_event"/>
+
+    <!-- Strike Select -->
+    <div class="{!'slds-form-element ' + if(v.error, 'slds-has-error ', '') + if(v.isMobile, 'ss-picklist--mobile ', '') + v.class}">
+        <label class="slds-form-element__label" onclick="{!c.toggleMenu}">
+            <aura:if isTrue="{!v.required}">
+                <abbr class="slds-required" title="required">*</abbr>
+            </aura:if>
+            {!v.label}
+        </label>
+        <aura:if isTrue="{!not(empty(v.helpText))}">
+            <!--<c:strike_tooltip placement="{!v.helpTextPlacement}" text="{!v.helpText}" class="ss-help-text-icon">
+                <lightning:icon iconName="utility:info" size="xx-small"/>
+            </c:strike_tooltip>-->
+        </aura:if>
+        <input name="{!v.name}" value="{!v.value}" type="hidden" />
+        
+        <div class="{!'slds-picklist slds-dropdown-trigger slds-dropdown-trigger--click' + if(v.openMenu, ' slds-is-open', '') + if(v.disabled, ' ss-disabled', '')}" aria-expanded="true">
+            <div class="slds-form-element__control">
+                <div aura:id="dropdown-trigger" class="slds-button slds-button--neutral slds-input slds-picklist__input slds-text-color--default slds-picklist__label ss-menu-button" aria-haspopup="true" tabindex="0" onfocus="{!c.toggleMenu}" onclick="{!c.stopProp}">
+                    <span class="slds-truncate ss-selected-text" title="{!v.valueLabel}">
+                        <aura:if isTrue="{!and(not(empty(v.iconName)), not(v.customIcon))}">
+                            <lightning:icon class="ss-selected-icon slds-input__icon" iconName="{!v.iconName}" size="x-small" />
+                        </aura:if>
+                        <aura:if isTrue="{!v.customIcon}">
+                            <span class="slds-icon_container">
+                               
+                            </span>
+                        </aura:if>
+                        {!if(empty(v.valueLabel), v.placeholder, v.valueLabel)}
+                    </span>
+                    <lightning:icon class="ss-dropdown-icon" iconName="utility:down" size="xx-small" />
+                </div>
+                <div class="{!'slds-dropdown slds-dropdown--left slds-dropdown--small ss-dropdown-control' + if(v.openMenu, ' slds-is-open', '')}" onclick="{!c.blur}">
+                    <ui:scrollerWrapper class="slds-scrollable--y ss-scroll-container">
+                        <div class="ss-picklist__mobile-header slds-grid slds-grid--pull-padded-xx-small">
+                            <div class="{!'ss-picklist__input slds-col slds-p-horizontal--xx-small' + if(v.searchable, '', ' slds-hide')}">
+                                <div class="slds-form-element slds-m-vertical--x-small slds-m-horizontal--small">
+                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+                                        <!--<c:strike_svg class="slds-input__icon slds-icon-text-default" xlinkHref="/resource/icons/utility-sprite/svg/symbols.svg#search" ariaHidden="true"></c:strike_svg>-->
+                                        <input aura:id="searchTerm" class="slds-input" type="text" onkeyup="{!c.searchTermChanged}" onclick="{!c.stopProp}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.isMobile}">
+                                <div class="{!'ss-picklist--mobile__cancel slds-col slds-p-horizontal--xx-small slds-text-align--right' + if(v.searchable, ' slds-no-flex', ' ss-full-button_container')}">
+                                    <button class="slds-button slds-button--neutral" onclick="{!c.blur}">Cancel</button>
+                                </div>
+                            </aura:if>
+                        </div>
+                        <ul class="slds-dropdown__list slds-dropdown--length-5" role="menu">
+                            <aura:if isTrue="{!v.allChildrenFiltered}">
+                                <li role="presentation">
+                                    <span class="slds-lookup__item-action slds-media sl-no-results" role="option">
+                                        <div class="slds-media__body">
+                                            <div class="slds-lookup__result-text">
+                                                {!format(v.noResultsMessage, '"' + v.searchTerm + '"')}
+                                            </div>
+                                        </div>
+                                    </span>
+                                </li>
+                            </aura:if>
+                            {!v.body}
+                        </ul>
+                    </ui:scrollerWrapper>
+                </div>
+            </div>
+            <aura:if isTrue="{!and(v.error, not(empty(v.errorMessage)))}">
+                <div class="slds-form-element__help">{!v.errorMessage}</div>
+            </aura:if>
+        </div>
+        
+    </div>
+</aura:component>

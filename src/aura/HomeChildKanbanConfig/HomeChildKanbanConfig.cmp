@@ -1,0 +1,137 @@
+<!--
+/*
+ * Copyright (c) 2018, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+-->
+<aura:component implements="force:appHostable,lightning:actionOverride,force:hasRecordId,force:hasSObjectName" controller="HomeChildKanbanCls">
+    
+    <aura:attribute name="objectList" type="object"/>
+    <aura:attribute name="childObjectList" type="object"/>
+    <aura:attribute name="allFieldsList" type="object"/>
+    <aura:attribute name="allPickValList" type="list"/>
+    <aura:attribute name="childObjectName" type="string"/>
+    <aura:attribute name="ObjectName" type="string"/>
+    <aura:attribute name="cardFields" type="string"/>
+    <aura:attribute name="grpFldName" type="string"/>
+    <aura:attribute name="sumFldName" type="string"/>
+    <aura:attribute name="pickExclVals" type="string"/>
+    <aura:attribute name="configName" type="string"/>
+    <aura:attribute name="kanbanFor" type="string"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.ObjectName}" action="{!c.objChanged}"/>
+    <aura:handler name="change" value="{!v.childObjectName}" action="{!c.childObjChanged}"/>
+    <aura:handler name="change" value="{!v.grpFldName}" action="{!c.grpFldChanged}"/>
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <!--
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+
+    <force:recordData aura:id="recordLoader"
+      recordId="{!v.recordId}"
+      layoutType="FULL"
+      targetRecord="{!v.record}"
+      targetFields="{!v.simpleRecord}"
+      targetError="{!v.recordError}"
+      recordUpdated="{!c.handleRecordUpdated}"
+      />
+    -->
+    
+    <br/>
+    <div class="slds-container_small" style="margin:auto;">
+        
+        <lightning:card iconName="utility:automate">
+            <lightning:spinner aura:id="spinner" variant="brand" alternativeText="Loading"/>
+            <aura:set attribute="title">
+                New Kanban Configuration
+            </aura:set>
+            <aura:set attribute="footer">
+                <lightning:button variant="brand" label="Save" onclick="{!c.saveConfigur}"/>
+            </aura:set>
+            <div class="slds-form slds-form_stacked slds-p-horizontal_small">
+                
+                <lightning:input name="nameInput" value="{!v.configName}" aura:id="configName" label="Name" required="true" messageWhenValueMissing="Please Fill-In A Name For The Configuration"/>
+                
+                <lightning:select name="selectItem" label="This Kanban Is For" onchange="{!c.CheckChild}" value="{!v.kanbanFor}">
+                    <option value="Home">Home Page</option>
+                    <option value="Child">Related List</option>
+                </lightning:select>
+                
+                <c:custom_select value="{!v.ObjectName}" aura:id="ObjectName" label="Select an object" placeholder="Search Objects" errorMessage="Invalid input" required="true" searchable="true">
+                    
+                    <c:custom_optionGroup label="Standard Objects">
+                        <aura:iteration items="{!v.objectList.standard}" var="objwrap">
+                            <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                        </aura:iteration>
+                    </c:custom_optionGroup>
+                    
+                    <c:custom_optionGroup label="Custom Objects">
+                        <aura:iteration items="{!v.objectList.custom}" var="objwrap">
+                            <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                        </aura:iteration>
+                    </c:custom_optionGroup>
+                    
+                </c:custom_select>
+                
+                <div class="slds-hide" aura:id="forChild" style="margin-top:0.5rem">
+                    
+                    <c:custom_select value="{!v.childObjectName}" aura:id="childObjectName" label="Select A Child Object" placeholder="Search Child Object" errorMessage="Invalid input" required="true" searchable="true">
+                        
+                        <c:custom_optionGroup label="Standard Objects">
+                            <aura:iteration items="{!v.childObjectList.standard}" var="objwrap">
+                                <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                            </aura:iteration>
+                        </c:custom_optionGroup>
+                        
+                        <c:custom_optionGroup label="Custom Objects">
+                            <aura:iteration items="{!v.childObjectList.custom}" var="objwrap">
+                                <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                            </aura:iteration>
+                        </c:custom_optionGroup>
+                        
+                    </c:custom_select>
+                    
+                </div>
+                
+                <div class="slds-m-top_x-small">
+                    <c:custom_select value="{!v.grpFldName}" aura:id="grpFldName" label="Group By" placeholder="Group By" errorMessage="Invalid input" required="true" searchable="true">
+                        <aura:iteration items="{!v.allFieldsList.groupBy}" var="objwrap">
+                            <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                        </aura:iteration>
+                    </c:custom_select>
+                </div>
+                                
+                <div class="slds-m-top_x-small">
+                <c:custom_multiPickList value="{!v.cardFields}" aura:id="cardFields" placeholder="Object Fields" label="Fields To Display In Kanban Card" required="true">
+                    <aura:iteration items="{!v.allFieldsList.all}" var="objwrap">
+                        <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                    </aura:iteration>
+                </c:custom_multiPickList>
+                </div>
+                
+                <div class="slds-m-top_x-small">
+                <c:custom_select value="{!v.sumFldName}" aura:id="sumFldName" label="Summarize By" placeholder="Summarize By" errorMessage="Invalid input" searchable="true">
+                    <aura:iteration items="{!v.allFieldsList.sumBy}" var="objwrap">
+                        <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                    </aura:iteration>
+                </c:custom_select>
+                </div>
+                
+                <div class="slds-m-top_x-small">
+                    <c:custom_multiPickList value="{!v.pickExclVals}" aura:id="pickExclVals" placeholder="Plickist Values To Be Excluded" label="Exclude Values From Group By">
+                        <aura:iteration items="{!v.allPickValList}" var="objwrap">
+                            <c:custom_option label="{!objwrap.objLabel}" value="{!objwrap.objName}"/>
+                        </aura:iteration>
+                    </c:custom_multiPickList>
+                </div>
+                
+            </div>
+        </lightning:card>
+    </div>
+</aura:component>

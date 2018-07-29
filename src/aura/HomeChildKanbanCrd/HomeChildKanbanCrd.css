@@ -1,0 +1,31 @@
+
+/*
+ * Copyright (c) 2018, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+.THIS {
+    transition: background-color 0.3s;
+    padding: 0.45rem;
+}
+.THIS .slds-link{
+    color: #0070d2;
+    text-decoration: none;
+    transition: color 0.1s linear;
+    cursor: pointer;
+}
+.THIS .slds-link:hover{
+    text-decoration: underline;
+}
+.THIS .floatRight{
+    float: right;
+    cursor: pointer;
+}
+.THIS .newCardColor, .THIS.newCardColor{
+    background: #d9ffdf !important;
+}
+.THIS img{
+    margin: 0px;
+}

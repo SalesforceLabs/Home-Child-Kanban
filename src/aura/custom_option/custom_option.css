@@ -1,0 +1,18 @@
+/*
+Strike by Appiphony
+Version: 1.0.0
+Website: http://www.lightningstrike.io
+GitHub: https://github.com/appiphony/Strike-Components
+License: BSD 3-Clause License
+*/
+.THIS .slds-lookup__item-action.strike-disabled,
+.THIS .slds-lookup__item-action.strike-disabled:hover,
+.THIS .slds-lookup__item-action.strike-disabled:focus,
+.THIS .slds-lookup__item-action.strike-disabled.slds-has-focus {
+    cursor: not-allowed;
+    background-color: t(colorBackground);
+    opacity: 0.5;
+}
+li.THIS .slds-lookup__item-action .slds-icon {
+    margin-top: -3px;
+}
