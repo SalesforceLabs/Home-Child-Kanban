@@ -9,10 +9,12 @@ All this with some cool animations.
 AppExchange Listing:
 https://appexchange.salesforce.com/appxListingDetail?listingId=a0N3A00000DmgtuUAB
 
+---
 
-##### Component Structure
+### Component Structure
 ![Component Structure](images/HomeChildKanban-git.png)
 
+---
 
-##### Setup/Walkthrough Video
+### Setup/Walkthrough Video
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/h7VdchJal_o/0.jpg)](http://www.youtube.com/watch?v=h7VdchJal_o)
