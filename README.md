@@ -12,6 +12,11 @@ https://appexchange.salesforce.com/appxListingDetail?listingId=a0N3A00000DmgtuUA
 ---
 
 ### Component Structure
+
+|- HomeChildKanban.cmp
+    |- HomeChildKanbanCol.cmp
+        |- HomeChildKanbanCrd.cmp
+
 ![Component Structure](images/HomeChildKanban-git.png)
 
 ---
