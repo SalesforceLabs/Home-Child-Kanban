@@ -1,4 +1,4 @@
-# Home-Child-Kanban
+# Home/Child Kanban
 
 Home/Child Kanban or if the / or space is a problem HomeChildKanban
 This component is fully native and highly customizable Drag & Drop Kanban view that can be configured for any related lists and home pages enabling you to choose the object, group and summarize its key differentiators & its records' key information to be shown on the kanban tiles.
